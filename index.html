@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRcraft — Beautiful QR Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">QR<span>craft</span></div>
+  <div class="logo-tag">Generator</div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Beautiful. Fast. Free.</div>
+  <h1>Generate <em>anything</em><br>as a QR code</h1>
+  <p class="hero-sub">URLs, Wi-Fi, contacts, text — crafted into elegant codes in seconds.</p>
+</section>
+
+<div class="container">
+
+  <!-- LEFT: Input + Customization -->
+  <div>
+    <div class="card">
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="url">🔗 URL</button>
+        <button class="tab-btn" data-tab="text">📝 Text</button>
+        <button class="tab-btn" data-tab="wifi">📶 Wi-Fi</button>
+        <button class="tab-btn" data-tab="contact">👤 Contact</button>
+      </div>
+
+      <!-- URL PANEL -->
+      <div class="panel active" id="panel-url">
+        <div class="form-group">
+          <label>Website URL</label>
+          <input type="url" id="url-input" placeholder="https://example.com" />
+        </div>
+      </div>
+
+      <!-- TEXT PANEL -->
+      <div class="panel" id="panel-text">
+        <div class="form-group">
+          <label>Plain Text</label>
+          <textarea id="text-input" placeholder="Type anything you'd like to encode…"></textarea>
+        </div>
+      </div>
+
+      <!-- WIFI PANEL -->
+      <div class="panel" id="panel-wifi">
+        <div class="form-group">
+          <label>Network Name (SSID)</label>
+          <input type="text" id="wifi-ssid" placeholder="My Home Network" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="wifi-pass" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label>Security</label>
+            <select id="wifi-sec">
+              <option value="WPA">WPA / WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">None</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="wifi-hidden" style="width:auto;accent-color:var(--accent)" />
+            Hidden network
+          </label>
+        </div>
+      </div>
+
+      <!-- CONTACT PANEL -->
+      <div class="panel" id="panel-contact">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="con-first" placeholder="Jane" />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="con-last" placeholder="Doe" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="con-phone" placeholder="+1 555 000 0000" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="con-email" placeholder="jane@example.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Organization</label>
+            <input type="text" id="con-org" placeholder="Acme Inc." />
+          </div>
+          <div class="form-group">
+            <label>Website</label>
+            <input type="url" id="con-web" placeholder="https://" />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-generate" onclick="generateQR()"><span>Generate QR Code</span></button>
+    </div>
+
+    <!-- CUSTOMIZATION CARD -->
+    <div class="card" style="margin-top:20px">
+      <div class="section-title">Customization</div>
+
+      <div class="color-row">
+        <div class="color-group">
+          <label>QR Color</label>
+          <div class="color-picker-wrap" onclick="document.getElementById('qr-fg').click()">
+            <input type="color" id="qr-fg" value="#1C1814" oninput="updateColorVal('qr-fg','fg-val')">
+            <span class="color-value" id="fg-val">#1C1814</span>
+          </div>
+        </div>
+        <div class="color-group">
+          <label>Background</label>
+          <div class="color-picker-wrap" onclick="document.getElementById('qr-bg').click()">
+            <input type="color" id="qr-bg" value="#FFFFFF" oninput="updateColorVal('qr-bg','bg-val')">
+            <span class="color-value" id="bg-val">#FFFFFF</span>
+          </div>
+        </div>
+      </div>
+
+      <label>Logo / Icon (optional)</label>
+      <div class="logo-preview" id="logo-preview">
+        <img id="logo-thumb" src="" alt="">
+        <span class="logo-preview-name" id="logo-name">logo.png</span>
+        <button class="logo-preview-remove" onclick="removeLogo()" title="Remove">✕</button>
+      </div>
+      <div class="logo-upload-area">
+        <input type="file" id="logo-file" accept="image/*" onchange="handleLogoUpload(this)">
+        <div class="upload-icon">🖼</div>
+        <div class="upload-text"><strong>Click to upload</strong> a logo or icon</div>
+        <div class="upload-text" style="margin-top:4px;font-size:11px;">PNG, SVG, JPG — centered in QR</div>
+      </div>
+
+      <div class="form-group">
+        <label>QR Size</label>
+        <select id="qr-size">
+          <option value="200">Small (200px)</option>
+          <option value="280" selected>Medium (280px)</option>
+          <option value="400">Large (400px)</option>
+          <option value="512">XL (512px)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Error Correction</label>
+        <select id="qr-ec">
+          <option value="L">Low (7%)</option>
+          <option value="M">Medium (15%)</option>
+          <option value="Q" selected>Quartile (25%) — Best for logos</option>
+          <option value="H">High (30%)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: QR Preview Panel -->
+  <div class="qr-panel">
+    <div class="card qr-display">
+      <div class="qr-placeholder" id="qr-placeholder">
+        <div class="qr-placeholder-icon">⬚</div>
+        <div class="qr-placeholder-text">Your code will appear here</div>
+        <div class="qr-placeholder-sub">Fill in the form and generate</div>
+      </div>
+
+      <div id="qr-output">
+        <div class="qr-label" id="qr-type-label">URL</div>
+        <div id="qr-canvas-wrap" class="qr-appear"></div>
+        <div class="qr-actions">
+          <button class="btn-action primary" onclick="downloadQR()">⬇ Download PNG</button>
+          <button class="btn-action" onclick="copyQR()">📋 Copy Image</button>
+          <button class="btn-action" onclick="regenerateQR()">↺ Regenerate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Crafted with care — <em>QRcraft</em> &nbsp;·&nbsp; All codes generated locally in your browser
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
